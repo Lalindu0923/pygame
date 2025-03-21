@@ -260,21 +260,21 @@ while run:
         screen.blit(textSurface, (bird_rectangle.x + 5, bird_rectangle.y + 5))
 
     # Draw other elements (trees, students, butterflies, etc.)
-    screen.blit(tree1, (50, 300))
+    screen.blit(tree1, (50, 300))    #adding objects to the level one 
     screen.blit(stree2, (260, 430))
     screen.blit(tree2, (350, 280))
     screen.blit(student1, (490, 410))
     screen.blit(student2, (660, 450))
     screen.blit(tree1, (750, 300))
     screen.blit(stree1, (600, 440))
-    if current_level >= 2:
+    if current_level >= 2: #adding objects to the level two
         screen.blit(stree1,(70,430))
         screen.blit(stree2,(190,430))
         screen.blit(student3,(330,510))
         screen.blit(butterfly, (890, 250))
         screen.blit(butterfly2,(900,100))
         
-    if current_level >= 3:
+    if current_level >= 3:#adding objects to the level three
         screen.blit(tree2,(1050,280))
         screen.blit(tree2,(900,280))
         screen.blit(mtree2,(-2,390))
@@ -284,7 +284,7 @@ while run:
         screen.blit(butterfly2,(1000,100))
         
         
-    if current_level >= 4:
+    if current_level >= 4:#adding objects to the level four
         screen.blit(mtree1,(890,400))
         screen.blit(student6,(1040,400))
         screen.blit(mstudent1,(10,500))
@@ -295,7 +295,7 @@ while run:
         screen.blit(butterfly2,(600,270))
         screen.blit(butterfly,(300,270))
         
-    if current_level >= 5:
+    if current_level >= 5:#adding objects to the level five
         screen.blit(mtree2,(320,390))
         screen.blit(student5,(700,400))
         screen.blit(butterfly,(950,450))
