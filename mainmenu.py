@@ -1,6 +1,5 @@
 import pygame
 import json
-import os
 
 pygame.init()
 
@@ -12,24 +11,25 @@ def load_player_data():
             data = json.load(file)
             return data.get("playerLevel", 1)  # Default to level 1 if "playerLevel" doesn't exist
     except FileNotFoundError:
-        # If the file doesn't exist, start from level 1
+        # If the file doesn't exist, start from level 1. Save the default level to a new file
         return 1
 
-def save_player_data(level):
-    with open(data_file, "w") as file:
-        json.dump({"playerLevel": level}, file)
+def save_player_data(level): # Save the player's level to a file
+    with open(data_file, "w") as file: # Open the file in write mode
+        json.dump({"playerLevel": level}, file) # Write the player's level to the file
 
-def update_player_level(current_level):
-    new_level = current_level
+def update_player_level(current_level): # Update the player's level
+    new_level = current_level # Default to the current level
     if current_level < 5:
-        new_level += 1
-    return new_level
+        new_level += 1 
+    return new_level # Return the new level
 
-# Load images
+# Load All the images to the background of the game. 
+#I use the rotozoom function to resize the images to the desired size
 try:
     tree1 = pygame.image.load('tree.png')
-    stree1 = pygame.transform.rotozoom(tree1, 0, 0.3)
-    mtree1 = pygame.transform.rotozoom(tree1, 0, 0.5)
+    stree1 = pygame.transform.rotozoom(tree1, 0, 0.3) #resize the image to 0.3 of the original size. 
+    mtree1 = pygame.transform.rotozoom(tree1, 0, 0.5) # i use this becuse I can youe the same tree with different shapes
     tree2 = pygame.image.load('tree2.png')
     stree2 = pygame.transform.rotozoom(tree2, 0, 0.3)
     mtree2 = pygame.transform.rotozoom(tree2, 0, 0.5)
@@ -65,7 +65,7 @@ try:
     bird2 = pygame.image.load('bird2.png')
     bird2 = pygame.transform.rotozoom(bird2, 0, 0.2)
     
-except pygame.error as e:
+except (pygame.error,FileNotFoundError) as e:
     print(f"Error loading image: {e}")
     # Fallback surfaces
     tree1 = pygame.Surface((50, 50))
@@ -79,16 +79,18 @@ except pygame.error as e:
     bird = pygame.Surface((50, 50))
     print(f"Error loading button images: {e}")
     # Fallback surfaces
-    continue_b = pygame.Surface((200, 50))
-    exit_b = pygame.Surface((200, 50))
+    continue_b = pygame.Surface((200, 50)) #`creating a surface for the continue button` = surface area of the continue button
+    exit_b = pygame.Surface((200, 50))#creating a surface for the exit button
     
-# Input rectangles
-tree_rectangle = pygame.Rect(600, 0, 200, 50)
+# Input rectangles for user inputs 
+tree_rectangle = pygame.Rect(600, 0, 200, 50) 
 student_rectangle = pygame.Rect(600, 50, 200, 50)
 butterfly_rectangle = pygame.Rect(600, 100, 200, 50)
 flower_rectangle = pygame.Rect(600, 150, 200, 50)
 bird_rectangle = pygame.Rect(600, 200, 200, 50)
 
+
+#color setup
 WHITE = (255, 255, 255)
 LIGHTGRAY = (200, 200, 200)
 BLACK = (0, 0, 0)
@@ -96,7 +98,8 @@ GREEN = (0, 255, 0)
 RED = (255, 0, 0)
 background = BLACK
 
-
+# Active and passive colors for input fields
+# I use this colors foe the input fields to show the user which field is active and which is not
 color_active = WHITE
 color_passive = LIGHTGRAY
 tree_color = color_passive
@@ -104,15 +107,20 @@ student_color = color_passive
 butterfly_color = color_passive
 flower_color = color_passive
 bird_color = color_passive
-
+#tree_color = student_color = butterfly_color = flower_color = bird_color = color_passive
+#this cannot use because the color will be the same for all the input fields, one color change affect to all other varibales also.
 
 # Initialize feedback variables
+# Incorrect feedback is the default feedback
+# I use this feedback to show the user if the input is correct or not
 feedback_trees = "Incorrect!"
 feedback_students = "Incorrect!"
 feedback_butterflies = "Incorrect!"
 feedback_flowers = "Incorrect!"
 feedback_birds = "Incorrect!"
+
 # Correct answers
+# I use this variables to store the correct answers for each level, defullt is 0. this will set the correct answers for each level with if conditions.
 correct_trees = 0
 correct_students = 0
 correct_butterflies = 0
@@ -121,11 +129,13 @@ correct_flowers = 0
 correct_birds = 0
 
 # Screen setup
+# I use this to set up the screen size and the font size
 screen_width = 1250
 screen_height = 700
 screen = pygame.display.set_mode((screen_width, screen_height))
 
 # Font setup
+# I use this to set up the font size and the font color
 baseFont = pygame.font.Font(None, 45)
 no_trees = '|'
 no_student = '|'
@@ -135,6 +145,7 @@ no_birds = '|'
 
 
 # Define button rectangles
+# I use this to set up the button size and the button color
 continue_rect = pygame.Rect(500, 400, 200, 50)  # (x, y, width, height)
 exit_rect = pygame.Rect(500, 480, 200, 50)  
 
@@ -146,21 +157,26 @@ label_flowers = baseFont.render("Number of Flowers: ", True, (200, 20, 120))
 label_birds = baseFont.render("Number of Birds: ", True, (200, 20, 120))
 continue_b = baseFont.render("CONTINUE ", True, (100, 0, 200))
 exit_b = baseFont.render("EXIT ", True, (100, 0, 200))
+
 # Load background image
+
 try:
     backgroundImage = pygame.image.load('background.jpg')
     backgroundImage = pygame.transform.scale(backgroundImage, (screen_width, screen_height))
-except pygame.error as e:
+except (pygame.error,FileNotFoundError) as e:
     print(f"Error loading background image: {e}")
     backgroundImage = pygame.Surface((screen_width, screen_height))
-    backgroundImage.fill(BLACK)
+    backgroundImage.fill(WHITE)
 
 # Game over flag
+#game will run until the game_over is false 
 game_over = False
 
 # Current level
 current_level = load_player_data()
 
+# setuping the correct asnwers for each level
+#In an each level new I item will added and pass items will get increased
 def update_game():
     global correct_trees, correct_students, correct_butterflies, correct_vehicles, correct_flowers, correct_birds
     if current_level == 1:
@@ -189,7 +205,9 @@ def update_game():
         correct_butterflies = 7
         correct_flowers = 5
         correct_birds = 2
-        
+
+# Reset game state
+# I use this to reset the game state to the default state after hit continue button        
 def reset_game_state():
     global no_trees, no_student, no_butterflies, no_vehicles, no_flowers, no_birds
     global feedback_trees, feedback_students, feedback_butterflies, feedback_vehicles, feedback_flowers, feedback_birds
@@ -206,11 +224,8 @@ def reset_game_state():
     feedback_flowers = "Incorrect!"
     feedback_birds = "Incorrect!"
     
-# # Button positions (X, Y)
-# continue_button_pos = (500, 400)  # X = 500, Y = 400
-# exit_button_pos = (500, 480)      # X = 500, Y = 480
 
-# Button rectangles (X, Y, width, height)
+# # Button rectangles (X, Y, width, height)
 continue_button = pygame.Rect(500,400, 200, 70)
 exit_button = pygame.Rect(500,480, 200, 70)
     
@@ -221,10 +236,10 @@ while run:
     screen.blit(backgroundImage, (0, 0))
     current_level = load_player_data()
     print(f"Starting game at level: {current_level}")  # Debugging line
+    
     # Update game state based on current level
     update_game()
-    # current_level = load_player_data()
-    # print(f"Starting game at level: {current_level}")  # Debugging line
+    
     # Draw input fields and labels
     screen.blit(label_tree, (320, 10))
     screen.blit(label_student, (260, 60))
@@ -325,6 +340,7 @@ while run:
         screen.blit(exit_b, (exit_rect.x + 60, exit_rect.y + 10))
 
     # Event handling
+    # I use this to handle the mouseclick in the game
     for event in pygame.event.get():
         if event.type == pygame.MOUSEBUTTONDOWN:
             if game_over:
@@ -346,7 +362,6 @@ while run:
                 tree_color = color_active
                 student_color = color_passive
                 butterfly_color = color_passive
-                vehicle_color = color_passive
                 flower_color = color_passive
                 bird_color = color_passive
             elif student_rectangle.collidepoint(event.pos):
@@ -354,7 +369,6 @@ while run:
                 student_color = color_active
                 tree_color = color_passive
                 butterfly_color = color_passive
-                vehicle_color = color_passive
                 flower_color = color_passive
                 bird_color = color_passive
             elif butterfly_rectangle.collidepoint(event.pos) and current_level >= 2:
@@ -362,7 +376,6 @@ while run:
                 butterfly_color = color_active
                 tree_color = color_passive
                 student_color = color_passive
-                vehicle_color = color_passive
                 flower_color = color_passive
                 bird_color = color_passive
             elif flower_rectangle.collidepoint(event.pos) and current_level >= 4:
@@ -371,7 +384,6 @@ while run:
                 tree_color = color_passive
                 student_color = color_passive
                 butterfly_color = color_passive
-                vehicle_color = color_passive
                 bird_color = color_passive
             elif bird_rectangle.collidepoint(event.pos) and current_level >= 5:
                 active_field = 'bird'
@@ -379,18 +391,16 @@ while run:
                 tree_color = color_passive
                 student_color = color_passive
                 butterfly_color = color_passive
-                vehicle_color = color_passive
                 flower_color = color_passive
             else:
                 active_field = None
                 tree_color = color_passive
                 student_color = color_passive
                 butterfly_color = color_passive
-                vehicle_color = color_passive
                 flower_color = color_passive
                 bird_color = color_passive
             
-                
+        # Handle keyboard input        
         if event.type == pygame.KEYDOWN:
             if active_field == 'tree':
                 if event.key == pygame.K_BACKSPACE:
